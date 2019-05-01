@@ -25,6 +25,8 @@ import java.util.Scanner;
 
 // PROGRAM BUGS
 /*	
+	
+ * With recent change to dealing cards/deck seems like I am getting similar cards, speculation? 
 	 
  * Allow user to input 0 at any time to pick up, strategic pick up etc. 
 	 
@@ -32,6 +34,7 @@ import java.util.Scanner;
  
  * Cpu started game with 5 face up and 2 cards in hand.. (10, 10, 14, 9, 9)
  * Happened again (10, 2, 13, 9, 9)
+ * (10, 2, 9, 8, 8)
  * could be an error with the last card being a double, ie computer inputs 9,2 even thought there is already 3 cards face up?
  
  * I have 3 14's, will not allow me to just play 2 of them (invalid selection) either 1 or all of them
@@ -52,39 +55,31 @@ import java.util.Scanner;
  14 = A
  -- basically just when you see a number print out letter if said number is seen?
  -- remember also that user input will be changed, need to convert letter into number as well
- -- might cause issues with scanner, expecting int but possibly getting int and char
- 
- Player 1 is given their 7 cards, then their 4 face down cards followed by player 2 given 7 cards then 4 face downs.
- in an actual game the cards are dealt to each player evenly, ie player 1 gets their first face down, then player 2 gets
- their first face down, player 1 gets 2nd face down, player 2 gets second face down, etc. 
- 
- 
+ -- might cause issues with scanner, expecting int but possibly getting int and char 
 */
 
 public class Game {	
 	public static void main(String[] args) {
-		System.out.println("Welcome to the virtual Jesus game! This is a 1 vs 1");
+		System.out.println("Welcome to the virtual Castle game! This is a 1 vs 1");
 
 		// initialization
 		Scanner in = new Scanner(System.in);
 		Deck deck = new Deck();
 		PlayingField field = new PlayingField();
-
+ 
 		Player player1 = new Player();
-		for (int i = 0; i < 7; i++) {
-			player1.addCard(deck.drawCard());
-		}
+		Player player2 = new Player();
+
+		//Deal
 		for (int i = 0; i < 4; i++) {
 			player1.addFaceDown(deck.drawCard());
-		}
-
-		Player player2 = new Player();
-		for (int i = 0; i < 7; i++) {
-			player2.addCard(deck.drawCard());
-		}
-		for (int i = 0; i < 4; i++) {
 			player2.addFaceDown(deck.drawCard());
 		}
+		
+		for (int i = 0; i < 7; i++) {
+			player1.addCard(deck.drawCard());
+			player2.addCard(deck.drawCard());
+		}		
 
 		// Choose face up cards. Set up Phase
 		player2.AIFaceUp();
