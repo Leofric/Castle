@@ -25,17 +25,10 @@ import java.util.Scanner;
 
 // PROGRAM BUGS
 /*	
-	
- * With recent change to dealing cards/deck seems like I am getting similar cards, speculation? 
-	 
+	  
  * Allow user to input 0 at any time to pick up, strategic pick up etc. 
 	 
  * If you win the game off of a face down 2, the game doesnt realize you won, continues game loop waiting for another input
- 
- * Cpu started game with 5 face up and 2 cards in hand.. (10, 10, 14, 9, 9)
- * Happened again (10, 2, 13, 9, 9)
- * (10, 2, 9, 8, 8)
- * could be an error with the last card being a double, ie computer inputs 9,2 even thought there is already 3 cards face up?
  
  * I have 3 14's, will not allow me to just play 2 of them (invalid selection) either 1 or all of them
  
@@ -82,7 +75,7 @@ public class Game {
 		}		
 
 		// Choose face up cards. Set up Phase
-		player2.AIFaceUp();
+		player2.AIFaceUp(); //bug here?
 		System.out.println("Please select 4 cards to put face up on the board.");
 		player1.displayHand();
 		int check = 0; // so if a player makes an invalid move, it goes through
@@ -105,7 +98,7 @@ public class Game {
 			
 			//Visualization of the game
 			player2.visualizeAI();
-				//player2.visualize(); //for debugging only! reveals all the cards
+				//player2.visualize(); //for debugging only! reveals cpu hand
 			player1.visualize();
 			
 			//Start Player 1 Turn

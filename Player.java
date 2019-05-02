@@ -71,27 +71,32 @@ public class Player {
 	// chooses the AI players face up cards based on their hand
 	public void AIFaceUp() {
 		int value = 14;
-		int faceUpCount = 0;
-		for (int i = 0; i < playersHand.size(); i++) {
-			int card = playersHand.get(i);
-			if (card == 2 || card == 10) {
-				faceUp.add(card);
-				playersHand.remove(i);
-				faceUpCount++;
-			}
-		}
-		while (value > 0 && faceUpCount < 4) {
-			for (int j = 0; j < playersHand.size(); j++) {
-				if (playersHand.get(j) == value) {
-					faceUp.add(playersHand.get(j));
-					playersHand.remove(j);
+		int faceUpCount = 0;		
+		
+		while (faceUpCount < 4) {
+			for (int i = 0; i < playersHand.size(); i++) {
+				if (playersHand.get(i) == 2 || playersHand.get(i) == 10) {
+					faceUp.add(playersHand.get(i));
+					playersHand.remove(i);
+					i--;
 					faceUpCount++;
+				}
+				else if (playersHand.get(i) == value) {
+					faceUp.add(playersHand.get(i));
+					playersHand.remove(i);
+					i--;
+					faceUpCount++;
+				}
+				
+				//not elegant, but needed to break in certain situations to prevent more than 4 cards being picked
+				if(faceUpCount>3){
+					i = playersHand.size();
 				}
 			}
 			value--;
 		}
 	}
-
+	
 	// only phase 0 and 1
 	public boolean play(int card, int frequency) {
 		boolean found = false;
