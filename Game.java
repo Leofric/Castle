@@ -27,9 +27,7 @@ import java.util.Scanner;
 /*	
 	  
  * Allow user to input 0 at any time to pick up, strategic pick up etc. 
-	 
- * If you win the game off of a face down 2, the game doesnt realize you won, continues game loop waiting for another input
- 
+	  
  * I have 3 14's, will not allow me to just play 2 of them (invalid selection) either 1 or all of them
  
  * Dumb AI: 
@@ -75,7 +73,7 @@ public class Game {
 		}		
 
 		// Choose face up cards. Set up Phase
-		player2.AIFaceUp(); //bug here?
+		player2.AIFaceUp();
 		System.out.println("Please select 4 cards to put face up on the board.");
 		player1.displayHand();
 		int check = 0; // so if a player makes an invalid move, it goes through
@@ -98,8 +96,11 @@ public class Game {
 			
 			//Visualization of the game
 			player2.visualizeAI();
-				//player2.visualize(); //for debugging only! reveals cpu hand
 			player1.visualize();
+			
+			//Debugging ONLY - show all cards
+			//player2.visualizeAll();
+			//player1.visualizeAll();
 			
 			//Start Player 1 Turn
 			while (invalidMove) { // This whole loop = 1 player turn, if they make a invalid move, they can try again
@@ -125,12 +126,19 @@ public class Game {
 
 							//handle special case card = 2
 							if (player1.getFaceDownCard(Integer.parseInt(input)) == 2) {
-								invalidMove = true; //not really invalid, just allows the loop to reiterate using same var
-								//what if this is the last card? then it should end anyway, might need an extra case
+								if(player1.getFaceDownCount() == 1){
+									invalidMove = false;
+								}
+								else{
+									invalidMove = true; //not really invalid, just allows the loop to reiterate using same var
+								}
 							} else {
 								invalidMove = false;
 							}
 							player1.removeCard(Integer.parseInt(input));
+							if(player1.getFaceDownCount() == 0){
+								invalidMove = false;
+							}
 						} else {
 							field.addCard(player1.getFaceDownCard(Integer.parseInt(input)));
 							System.out.println("You played: " + player1.getFaceDownCard(Integer.parseInt(input)));

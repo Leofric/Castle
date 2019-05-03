@@ -288,7 +288,7 @@ public class Player {
 		return frequency;
 	}
 	
-	//an attempt at making a UI for a console based card game lol
+	//an attempt at making a UI for a console based card game
 	public void visualize(){
 		System.out.println("** YOU **");
 		System.out.print("   Hand			[");
@@ -356,6 +356,43 @@ public class Player {
 			}
 			else{
 				System.out.print("?, ");	
+			}
+		}
+		System.out.print("\n\n");
+	}
+
+	//For Debugging ONLY show all cards including face down
+	public void visualizeAll(){
+		System.out.println("** YOU **");
+		System.out.print("   Hand			[");
+		for(int i = 0; i<playersHand.size(); i++){
+			if(i == playersHand.size()-1){
+				System.out.print(playersHand.get(i)+"]");
+			}
+			else{
+				System.out.print(playersHand.get(i)+", ");
+			}
+		}
+		System.out.print("\n");
+		
+		System.out.print("   Face Up		[");
+		for(int i = 0; i<faceUp.size(); i++){
+			if(i == faceUp.size()-1){
+				System.out.print(faceUp.get(i)+"]");
+			}
+			else{
+				System.out.print(faceUp.get(i)+", ");
+			}
+		}
+		System.out.print("\n");
+	
+		System.out.print("   Face Down		[");
+		for(int i = 0; i<faceDown.size(); i++){
+			if(i == faceDown.size()-1){
+				System.out.print(faceDown.get(i)+"]");
+			}
+			else{
+				System.out.print(faceDown.get(i)+", ");
 			}
 		}
 		System.out.print("\n\n");
