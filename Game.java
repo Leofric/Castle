@@ -25,14 +25,14 @@ import java.util.Scanner;
 
 // PROGRAM BUGS
 /*	
-	  
- * Allow user to input 0 at any time to pick up, strategic pick up etc. 
-	  
+	 
  * I have 3 14's, will not allow me to just play 2 of them (invalid selection) either 1 or all of them
  
  * Dumb AI: 
  	 - AI has 2, 2, 10 - then it is better to play the 10. currently hard coded to prioritize 2's
  	 - never play a 10 (2) times unless drawing deck is empty?
+ 	 - 2, 2, 10 makes sense if that is all you have going into face up phase
+	 
 	 - doesn't play high cards when you are on last face down cards, will even play a 10 and clear the pile and 
 	 	let you win, no logic
  
@@ -151,7 +151,6 @@ public class Game {
 								int card = field.empty();
 								player1.addCard(card);
 							}
-
 						}
 					} else {
 						System.out.println("Invalid move, please select one of the face down cards..");
@@ -176,10 +175,13 @@ public class Game {
 							System.out.println("Something went wrong");
 						}
 						invalidMove = false;
-					} else
+					} 
+					else {
 						System.out.println("invalid selection");
+					}
 				//Final check, if you play a higher card, continue, if not pick up. Also logic for special cards 10 & 2
-				} else if (player1.play(Integer.parseInt(input)) && (Integer.parseInt(input) >= field.getLastCard()
+				} 
+				else if (player1.play(Integer.parseInt(input)) && (Integer.parseInt(input) >= field.getLastCard()
 						|| Integer.parseInt(input) == 2 || Integer.parseInt(input) == 10)) {
 					player1.removeCard(Integer.parseInt(input));
 					field.addCard(Integer.parseInt(input));
@@ -200,9 +202,20 @@ public class Game {
 
 					System.out.println("You played: " + Integer.parseInt(input));
 
-				} else if (!player1.play(Integer.parseInt(input))) {
+				}
+				else if(Integer.parseInt(input)==0){ //'strategic' pick up, allows user to pick up even if they can beat it
+					System.out.println("You picked up");
+					invalidMove = false;
+
+					while (field.getSize() > 0) {
+						int card = field.empty();
+						player1.addCard(card);
+					}
+				}
+				else if (!player1.play(Integer.parseInt(input))) {
 					System.out.println("invalid selection");
-				} else {
+				} 
+				else {
 					System.out.println("You picked up");
 					invalidMove = false;
 
