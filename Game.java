@@ -25,9 +25,7 @@ import java.util.Scanner;
 
 // PROGRAM BUGS
 /*	
-	 
- * I have 3 14's, will not allow me to just play 2 of them (invalid selection) either 1 or all of them
- 
+	  
  * Dumb AI: 
  	 - AI has 2, 2, 10 - then it is better to play the 10. currently hard coded to prioritize 2's
  	 - never play a 10 (2) times unless drawing deck is empty?

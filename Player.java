@@ -98,18 +98,19 @@ public class Player {
 	}
 	
 	// only phase 0 and 1
+	//fix here to allow player to play 2 of the same even if they have 3
 	public boolean play(int card, int frequency) {
 		boolean found = false;
 		int count = 0;
 		if (phase == 2) {
-			found = false; // you cant play 2 face down cards at a time
+			found = false; // you cant play 2 face down cards at a time (unless you get lucky with a 2 but that is handled elsewhere)
 		} else if (phase == 1) {
 			for (int i = 0; i < faceUp.size(); i++) {
 				if (faceUp.get(i) == card) {
 					count++;
 				}
 			}
-			if (count == frequency) {
+			if (count >= frequency) {
 				found = true;
 			}
 		} else {
@@ -118,7 +119,7 @@ public class Player {
 					count++;
 				}
 			}
-			if (count == frequency) {
+			if (count >= frequency) {
 				found = true;
 			}
 		}
