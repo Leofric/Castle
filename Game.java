@@ -25,6 +25,10 @@ import java.util.Scanner;
 
 // PROGRAM BUGS
 /*	
+	
+ * If you ever input a string you break the program
+ * 	rewrite whole program? Would have to fix all methods to check string, convert string to int, etc. 
+	  
 	  
  * Dumb AI: 
  	 - AI has 2, 2, 10 - then it is better to play the 10. currently hard coded to prioritize 2's
@@ -77,7 +81,14 @@ public class Game {
 		int check = 0; // so if a player makes an invalid move, it goes through
 					   // the loop again instead of adding a 0
 		while (check < 4) {
-			int playerInput = in.nextInt();
+			//major surgery, testing if converting to string is possible or not
+//			int playerInput = in.nextInt();
+//			if (player1.addFaceUp(playerInput)) {
+//				check++;
+//			} else
+//				System.out.println("Sorry that card is not in your hand, try again");
+			
+			String playerInput = in.nextLine();
 			if (player1.addFaceUp(playerInput)) {
 				check++;
 			} else

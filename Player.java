@@ -23,7 +23,48 @@ public class Player {
 		playersHand.add(card);
 	}
 
-	public boolean addFaceUp(int card) {
+	//Major surgery, attempt to convert this to handle any user input(string)
+	public boolean addFaceUp(String input) {
+		boolean found = false;
+		int card = 0;
+		
+		try{
+			card = Integer.parseInt(input);
+		}
+		catch(IllegalArgumentException e){
+			if(input.equals("J")){
+				card = 11;
+			}
+			else if(input.equals("Q")){
+				card = 12;
+			}
+			else if(input.equals("K")){
+				card = 13;
+			}
+			else if(input.equals("A")){
+				card = 14;
+			}
+			else{
+				card = 0;
+			}
+		}
+		finally{
+			for (int i = 0; i < playersHand.size(); i++) {
+				if (playersHand.get(i) == card) {
+					found = true;
+					playersHand.remove(i);
+					faceUp.add(card);
+					break;
+				}
+			}
+		}
+		return found;
+	}
+	
+	//OLD CODE IN CASE IT FAILS
+	/*
+	 
+	 	public boolean addFaceUp(int card) {
 		boolean found = false;
 		for (int i = 0; i < playersHand.size(); i++) {
 			if (playersHand.get(i) == card) {
@@ -37,26 +78,58 @@ public class Player {
 			System.out.println("Error: bad input");
 		return found;
 	}
+	 
+	 */
+	
+	
+	
+	
+	
+	
+	
 
 	public void addFaceDown(int card) {
 		faceDown.add(card);
 	}
 
+	//this is never used?
 	public void displayFaceUp() {
-		String output = "Your Face-Up Cards: [";
+		String output = "Your Face-Up Cards: ";
 		for (int i = 0; i < faceUp.size(); i++) {
-			if (i == faceUp.size() - 1) {
-				output += faceUp.get(i) + "]";
-			} else
-				output += faceUp.get(i) + ", ";
+			if(faceUp.get(i) == 11){
+				output += "J";
+			}
+			else if(faceUp.get(i) == 12){
+				output += "Q ";
+			}
+			else if(faceUp.get(i) == 13){
+				output += "K ";
+			}
+			else if(faceUp.get(i) == 14){
+				output += "A ";
+			}
+			else{
+				output += faceUp.get(i)+" ";
+			}
 		}
 		System.out.println(output);
+
+//OLD
+//		String output = "Your Face-Up Cards: [";
+//		for (int i = 0; i < faceUp.size(); i++) {
+//			if (i == faceUp.size() - 1) {
+//				output += faceUp.get(i) + "]";
+//			} else
+//				output += faceUp.get(i) + ", ";
+//		}
+//		System.out.println(output);
 	}
 
 	public void displayHand() {
 		System.out.println("Hand: " + playersHand);
 	}
 
+	//Never Used?
 	public void displayFaceDown() {
 		String output = "Your Face-Down Cards: [";
 		for (int i = 0; i < faceDown.size(); i++) {
@@ -130,11 +203,7 @@ public class Player {
 	// manually in the gameloop
 	public boolean play(int card) {
 		boolean found = false;
-		if (phase == 2) {
-			if (card <= faceDownCount) {
-				found = true;
-			}
-		} else if (phase == 1) {
+		if (phase == 1) {
 			for (int i = 0; i < faceUp.size(); i++) {
 				if (faceUp.get(i) == card) {
 					found = true;
