@@ -52,5 +52,40 @@ public class PlayingField {
 			}
 		return clear;
 	}
+	
+	public boolean compare(String input){
+		boolean valid = false;
+		int card = 0;
+		
+		try{
+			card = Integer.parseInt(input);
+		}
+		catch(IllegalArgumentException e){
+			if(input.equals("J")){
+				card = 11;
+			}
+			else if(input.equals("Q")){
+				card = 12;
+			}
+			else if(input.equals("K")){
+				card = 13;
+			}
+			else if(input.equals("A")){
+				card = 14;
+			}
+			else{
+				card = 0;
+			}
+		}
+		finally{
+			if(card >= this.getLastCard()){
+				valid = true;
+			}
+			else{
+				valid = false;
+			}
+		}		
+		return valid;
+	}
 
 }

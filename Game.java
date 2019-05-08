@@ -40,17 +40,6 @@ import java.util.Scanner;
  
 */
 
-// Quality of life changes
-/*
- 11 = J
- 12 = Q
- 13 = K
- 14 = A
- -- basically just when you see a number print out letter if said number is seen?
- -- remember also that user input will be changed, need to convert letter into number as well
- -- might cause issues with scanner, expecting int but possibly getting int and char 
-*/
-
 public class Game {	
 	public static void main(String[] args) {
 		System.out.println("Welcome to the virtual Castle game! This is a 1 vs 1");
@@ -80,14 +69,7 @@ public class Game {
 		player1.displayHand();
 		int check = 0; // so if a player makes an invalid move, it goes through
 					   // the loop again instead of adding a 0
-		while (check < 4) {
-			//major surgery, testing if converting to string is possible or not
-//			int playerInput = in.nextInt();
-//			if (player1.addFaceUp(playerInput)) {
-//				check++;
-//			} else
-//				System.out.println("Sorry that card is not in your hand, try again");
-			
+		while (check < 4) {			
 			String playerInput = in.nextLine();
 			if (player1.addFaceUp(playerInput)) {
 				check++;
@@ -95,6 +77,8 @@ public class Game {
 				System.out.println("Sorry that card is not in your hand, try again");
 		}
 
+// MAJOR SURGERY OK UP TO THIS POINT
+		
 		// Starting the game, Phase 1
 		System.out.println("Choose a card to play to begin the game!");
 		boolean win = false;
@@ -125,68 +109,80 @@ public class Game {
 				String input = in.next();
 
 				if (player1.getPhase() == 2) {
-					if (Integer.parseInt(input) < player1.getFaceDownCount()) {
-						if (player1.getFaceDownCard(Integer.parseInt(input)) >= field.getLastCard()
-								|| player1.getFaceDownCard(Integer.parseInt(input)) == 10
-								|| player1.getFaceDownCard(Integer.parseInt(input)) == 2) {
-
-							System.out.println("You played: " + player1.getFaceDownCard(Integer.parseInt(input)));
-							field.addCard(player1.getFaceDownCard(Integer.parseInt(input)));
-
-							//handle special case card = 2
-							if (player1.getFaceDownCard(Integer.parseInt(input)) == 2) {
-								if(player1.getFaceDownCount() == 1){
+					try{
+						if (Integer.parseInt(input) < player1.getFaceDownCount()) { //need a try catch here. parse int
+							if (player1.getFaceDownCard(Integer.parseInt(input)) >= field.getLastCard()
+									|| player1.getFaceDownCard(Integer.parseInt(input)) == 10
+									|| player1.getFaceDownCard(Integer.parseInt(input)) == 2) {
+	
+								System.out.println("You played: " + player1.getFaceDownCard(Integer.parseInt(input)));
+								field.addCard(player1.getFaceDownCard(Integer.parseInt(input)));
+	
+								//handle special case card = 2
+								if (player1.getFaceDownCard(Integer.parseInt(input)) == 2) {
+									if(player1.getFaceDownCount() == 1){
+										invalidMove = false;
+									}
+									else{
+										invalidMove = true; //not really invalid, just allows the loop to reiterate using same var
+									}
+								} else {
 									invalidMove = false;
 								}
-								else{
-									invalidMove = true; //not really invalid, just allows the loop to reiterate using same var
+								player1.removeCard(Integer.parseInt(input));
+								if(player1.getFaceDownCount() == 0){
+									invalidMove = false;
 								}
 							} else {
+								field.addCard(player1.getFaceDownCard(Integer.parseInt(input)));
+								System.out.println("You played: " + player1.getFaceDownCard(Integer.parseInt(input)));
+								player1.removeCard(Integer.parseInt(input));
+	
+								System.out.println("You picked up");
 								invalidMove = false;
-							}
-							player1.removeCard(Integer.parseInt(input));
-							if(player1.getFaceDownCount() == 0){
-								invalidMove = false;
+	
+								while (field.getSize() > 0) {
+									int card = field.empty();
+									player1.addCard(card);
+								}
 							}
 						} else {
-							field.addCard(player1.getFaceDownCard(Integer.parseInt(input)));
-							System.out.println("You played: " + player1.getFaceDownCard(Integer.parseInt(input)));
-							player1.removeCard(Integer.parseInt(input));
-
-							System.out.println("You picked up");
-							invalidMove = false;
-
-							while (field.getSize() > 0) {
-								int card = field.empty();
-								player1.addCard(card);
-							}
+							System.out.println("Invalid move, please select one of the face down cards..");
 						}
-					} else {
-						System.out.println("Invalid move, please select one of the face down cards..");
+					}
+					catch(IllegalArgumentException e){
+						System.out.println("Select a face down card by entering it's position 0, 1, 2, or 3");
+						invalidMove = true; //reloop //can probably omit this line, reloops by default.
 					}
 				}
 				else if (input.contains(",")) {
 					arguments = input.split(",");
-					if (player1.play(Integer.parseInt(arguments[0]), Integer.parseInt(arguments[1]))
-							&& (Integer.parseInt(arguments[0]) >= field.getLastCard())) {
-						for (int i = 0; i < Integer.parseInt(arguments[1]); i++) {
-							player1.removeCard(Integer.parseInt(arguments[0]));
-							field.addCard(Integer.parseInt(arguments[0]));
-						}
-						System.out.println("You played: " + Integer.parseInt(arguments[0]) + " " + "("
-								+ Integer.parseInt(arguments[1]) + ") times");
-						// draw
-						try {
-							while (player1.handSize() < 3 && deck.cardsLeft() > 0) {
-								player1.addCard(deck.drawCard());
+					try{
+						if (player1.play(arguments[0], Integer.parseInt(arguments[1]))
+								&& (field.compare(arguments[0]))) {
+							for (int i = 0; i < Integer.parseInt(arguments[1]); i++) {
+								player1.removeCard(Integer.parseInt(arguments[0]));
+								field.addCard(Integer.parseInt(arguments[0]));
 							}
-						} catch (IllegalArgumentException x) {
-							System.out.println("Something went wrong");
+							System.out.println("You played: " + Integer.parseInt(arguments[0]) + " " + "("
+									+ Integer.parseInt(arguments[1]) + ") times");
+							// draw
+							try {
+								while (player1.handSize() < 3 && deck.cardsLeft() > 0) {
+									player1.addCard(deck.drawCard());
+								}
+							} catch (IllegalArgumentException x) {
+								System.out.println("Something went wrong");
+							}
+							invalidMove = false;
+						} 
+						else {
+							System.out.println("invalid selection");
 						}
-						invalidMove = false;
-					} 
-					else {
-						System.out.println("invalid selection");
+					}
+					catch(IllegalArgumentException e){
+						System.out.println("To make a multiple card play, first type the card then the frequency like this: J,2");
+						invalidMove = true; //probably not needed
 					}
 				//Final check, if you play a higher card, continue, if not pick up. Also logic for special cards 10 & 2
 				} 
