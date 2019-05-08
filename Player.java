@@ -25,36 +25,14 @@ public class Player {
 
 	public boolean addFaceUp(String input) {
 		boolean found = false;
-		int card = 0;
+		int card = this.convertInput(input);
 		
-		try{
-			card = Integer.parseInt(input);
-		}
-		catch(IllegalArgumentException e){
-			if(input.equals("J")){
-				card = 11;
-			}
-			else if(input.equals("Q")){
-				card = 12;
-			}
-			else if(input.equals("K")){
-				card = 13;
-			}
-			else if(input.equals("A")){
-				card = 14;
-			}
-			else{
-				card = 0;
-			}
-		}
-		finally{
-			for (int i = 0; i < playersHand.size(); i++) {
-				if (playersHand.get(i) == card) {
-					found = true;
-					playersHand.remove(i);
-					faceUp.add(card);
-					break;
-				}
+		for (int i = 0; i < playersHand.size(); i++) {
+			if (playersHand.get(i) == card) {
+				found = true;
+				playersHand.remove(i);
+				faceUp.add(card);
+				break;
 			}
 		}
 		return found;
@@ -63,30 +41,6 @@ public class Player {
 	public void addFaceDown(int card) {
 		faceDown.add(card);
 	}
-
-//	//Legacy code, replaced this method when I created the Visualize() method, use this as reference to rewrite that one
-//	// can probably delete this afterwards.
-//	public void displayFaceUp() {
-//		String output = "Your Face-Up Cards: ";
-//		for (int i = 0; i < faceUp.size(); i++) {
-//			if(faceUp.get(i) == 11){
-//				output += "J";
-//			}
-//			else if(faceUp.get(i) == 12){
-//				output += "Q ";
-//			}
-//			else if(faceUp.get(i) == 13){
-//				output += "K ";
-//			}
-//			else if(faceUp.get(i) == 14){
-//				output += "A ";
-//			}
-//			else{
-//				output += faceUp.get(i)+" ";
-//			}
-//		}
-//		System.out.println(output);
-//	}
 
 	public void displayHand() {		
 		System.out.print("Hand: ");
@@ -109,18 +63,6 @@ public class Player {
 		}
 		System.out.print("\n");
 	}
-
-//	//Legacy code, replaced this method when I created the Visualize() method; same code pretty much, can probably delete this
-//	public void displayFaceDown() {
-//		String output = "Your Face-Down Cards: [";
-//		for (int i = 0; i < faceDown.size(); i++) {
-//			if (i == faceDown.size() - 1) {
-//				output += "?]";
-//			} else
-//				output += "? ";
-//		}
-//		System.out.println(output);
-//	}
 
 	// chooses the AI players face up cards based on their hand
 	public void AIFaceUp() {
@@ -151,54 +93,38 @@ public class Player {
 		}
 	}
 	
-	// only phase 0 and 1
-	//fix here to allow player to play 2 of the same even if they have 3
-	public boolean play(int card, int frequency) {
-		boolean found = false;
-		int count = 0;
-		if (phase == 2) {
-			found = false; // you cant play 2 face down cards at a time (unless you get lucky with a 2 but that is handled elsewhere)
-		} else if (phase == 1) {
-			for (int i = 0; i < faceUp.size(); i++) {
-				if (faceUp.get(i) == card) {
-					count++;
-				}
-			}
-			if (count >= frequency) {
-				found = true;
-			}
-		} else {
-			for (int i = 0; i < playersHand.size(); i++) {
-				if (playersHand.get(i) == card) {
-					count++;
-				}
-			}
-			if (count >= frequency) {
-				found = true;
-			}
-		}
-		return found;
+	//player 2 card play
+	public boolean play(String card, int frequency) {
+		boolean valid = false;
+		int cardvalue = this.convertInput(card);
+		
+		if (phase == 2)
+			valid = false;
+		else if (phase == 1 && (this.getCardFrequencyFaceup(cardvalue)>= frequency))
+			valid = true;
+		else if(this.getCardFrequency(cardvalue)>= frequency)
+			valid = true;
+		else
+			valid = false;
+		return valid;
 	}
 
-	// phase 0, 1, and 2 might not need play for phase 2, i can just do it
-	// manually in the gameloop
-	public boolean play(int card) {
-		boolean found = false;
-		if (phase == 1) {
-			for (int i = 0; i < faceUp.size(); i++) {
-				if (faceUp.get(i) == card) {
-					found = true;
-				}
-			}
-		} else {
-			for (int i = 0; i < playersHand.size(); i++) {
-				if (playersHand.get(i) == card) {
-					found = true;
-				}
-			}
-		}
-		return found;
+	//normal player 1 card play
+	public boolean play(String input) {
+		boolean valid = false;
+		int card = this.convertInput(input);
+			
+		if((phase == 1) && (this.getCardFrequencyFaceup(card) > 0))
+			valid = true;
+		else if(this.getCardFrequency(card) > 0)
+			valid = true;
+		else
+			valid = false;	
+		return valid;
 	}
+	
+	//chooses 'best' card for the AI to play based on situation
+	//can probably optimize this. Clean it up when you come back to improve AI logic.
 	public int AIplay(int lastCard) {
 		int bestCard = 0;
 		boolean has2 = false;
@@ -269,6 +195,7 @@ public class Player {
 		return bestCard;
 	}
 
+	//method removes card from the correct location based on the phase
 	public void removeCard(int card) {
 		if (phase == 2) {
 			faceDown.remove(card);
@@ -291,43 +218,50 @@ public class Player {
 		}
 	}
 
+	//returns the size of the player hand
 	public int handSize() {
 		return playersHand.size();
 	}
 
+	//controls player phase
 	public void setPhase(int phase) {
 		this.phase = phase;
 	}
 
+	//returns number of face down cards left
 	public int getFaceDownCount() {
 		return this.faceDownCount;
 	}
 
+	//returns the number of face up cards left
 	public int getFaceUpCount() {
 		return this.faceUpCount;
 	}
 
+	//returns current player phase
 	public int getPhase() {
 		return this.phase;
 	}
 
+	//return value of face down card at given index
 	public int getFaceDownCard(int index) {
 		return faceDown.get(index);
 	}
 	
+	//return frequency of input card in player hand
 	public int getCardFrequency(int card){
 		int frequency = 0;
 		
-		for (int i = 0; i < playersHand.size(); i++) { //iterate thru hand
+		for (int i = 0; i < playersHand.size(); i++) {
 			if (playersHand.get(i) == card){
 				frequency++;
 			}
 		}
-		
 		return frequency;
 	}
 	
-	public int getCardFrequencyP1(int card){
+	//return frequency of input card in player faceup cards
+	public int getCardFrequencyFaceup(int card){
 		int frequency = 0;
 		
 		for (int i = 0; i < faceUp.size(); i++) { //iterate thru hand
@@ -335,7 +269,6 @@ public class Player {
 				frequency++;
 			}
 		}
-		
 		return frequency;
 	}
 	
@@ -487,4 +420,31 @@ public class Player {
 		}
 		System.out.print("\n\n");
 	}
+
+	public int convertInput(String input){
+		int card = 0;
+		
+		try{
+			card = Integer.parseInt(input);
+		}
+		catch(IllegalArgumentException e){
+			if(input.equals("J")){
+				card = 11;
+			}
+			else if(input.equals("Q")){
+				card = 12;
+			}
+			else if(input.equals("K")){
+				card = 13;
+			}
+			else if(input.equals("A")){
+				card = 14;
+			}
+			else{
+				card = 0;
+			}
+		}
+		return card;
+	}
+
 }

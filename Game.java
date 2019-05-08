@@ -303,7 +303,7 @@ public class Game {
 					frequency = player2.getCardFrequency(AIMove);
 				}
 				else if(player2.getPhase() == 1){
-					frequency = player2.getCardFrequencyP1(AIMove);
+					frequency = player2.getCardFrequencyFaceup(AIMove);
 				}
 				else{
 					//this happens in phase 2, face down cards, cannot play multiples of face down bc they are hidden
