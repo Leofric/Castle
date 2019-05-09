@@ -23,15 +23,14 @@ public class Player {
 		playersHand.add(card);
 	}
 
-	public boolean addFaceUp(String input) {
+	public boolean addFaceUp(int input) {
 		boolean found = false;
-		int card = this.convertInput(input);
 		
 		for (int i = 0; i < playersHand.size(); i++) {
-			if (playersHand.get(i) == card) {
+			if (playersHand.get(i) == input) {
 				found = true;
 				playersHand.remove(i);
-				faceUp.add(card);
+				faceUp.add(input);
 				break;
 			}
 		}
@@ -94,15 +93,14 @@ public class Player {
 	}
 	
 	//player 2 card play
-	public boolean play(String card, int frequency) {
+	public boolean play(int card, int frequency) {
 		boolean valid = false;
-		int cardvalue = this.convertInput(card);
 		
 		if (phase == 2)
 			valid = false;
-		else if (phase == 1 && (this.getCardFrequencyFaceup(cardvalue)>= frequency))
+		else if (phase == 1 && (this.getCardFrequencyFaceup(card)>= frequency))
 			valid = true;
-		else if(this.getCardFrequency(cardvalue)>= frequency)
+		else if(this.getCardFrequency(card)>= frequency)
 			valid = true;
 		else
 			valid = false;
@@ -110,9 +108,8 @@ public class Player {
 	}
 
 	//normal player 1 card play
-	public boolean play(String input) {
+	public boolean play(int card) {
 		boolean valid = false;
-		int card = this.convertInput(input);
 			
 		if((phase == 1) && (this.getCardFrequencyFaceup(card) > 0))
 			valid = true;
@@ -217,7 +214,7 @@ public class Player {
 			}
 		}
 	}
-
+	
 	//returns the size of the player hand
 	public int handSize() {
 		return playersHand.size();
@@ -420,31 +417,5 @@ public class Player {
 		}
 		System.out.print("\n\n");
 	}
-
-	public int convertInput(String input){
-		int card = 0;
 		
-		try{
-			card = Integer.parseInt(input);
-		}
-		catch(IllegalArgumentException e){
-			if(input.equals("J")){
-				card = 11;
-			}
-			else if(input.equals("Q")){
-				card = 12;
-			}
-			else if(input.equals("K")){
-				card = 13;
-			}
-			else if(input.equals("A")){
-				card = 14;
-			}
-			else{
-				card = 0;
-			}
-		}
-		return card;
-	}
-
 }

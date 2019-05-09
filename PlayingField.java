@@ -12,13 +12,18 @@ public class PlayingField {
 	public void addCard(int card) {
 		playingField.add(card);
 	}
+	
+	public void addCard(String input) {
+		int card = this.convertInput(input);
+		playingField.add(card);
+	}
 
 	public int getLastCard() {
 		int returns;
 		int lastCard = playingField.size();
-		if (playingField.size() > 0) {
+		if (playingField.size() > 0)
 			returns = playingField.get(lastCard - 1);
-		} else
+		else
 			returns = 0;
 
 		return returns;
@@ -55,6 +60,14 @@ public class PlayingField {
 	
 	public boolean compare(String input){
 		boolean valid = false;
+		int card = this.convertInput(input);
+
+		if(card >= this.getLastCard())
+			valid = true;		
+		return valid;
+	}
+
+	public int convertInput(String input){
 		int card = 0;
 		
 		try{
@@ -77,15 +90,6 @@ public class PlayingField {
 				card = 0;
 			}
 		}
-		finally{
-			if(card >= this.getLastCard()){
-				valid = true;
-			}
-			else{
-				valid = false;
-			}
-		}		
-		return valid;
+		return card;
 	}
-
 }

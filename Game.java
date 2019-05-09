@@ -25,9 +25,10 @@ import java.util.Scanner;
 
 // PROGRAM BUGS
 /*	
-	
- * If you ever input a string you break the program
- * 	rewrite whole program? Would have to fix all methods to check string, convert string to int, etc. 
+
+ * If you can't beat the current field card with your face up card, do you still put face up card on top of pile
+ * then pick it up? or do you leave the face up card face up / separate from the pile? I think I have it right but
+ * not entirely sure on the rules. 
 	  
 	  
  * Dumb AI: 
@@ -70,14 +71,12 @@ public class Game {
 		int check = 0; // so if a player makes an invalid move, it goes through
 					   // the loop again instead of adding a 0
 		while (check < 4) {			
-			String playerInput = in.nextLine();
-			if (player1.addFaceUp(playerInput)) {
+			int card = Game.convertInput(in.nextLine());
+			if (player1.addFaceUp(card)) {
 				check++;
 			} else
 				System.out.println("Sorry that card is not in your hand, try again");
 		}
-
-// MAJOR SURGERY OK UP TO THIS POINT
 		
 		// Starting the game, Phase 1
 		System.out.println("Choose a card to play to begin the game!");
@@ -106,66 +105,64 @@ public class Game {
 				} else {
 					player1.setPhase(2);
 				}
+				
 				String input = in.next();
+				int card = 0;
+				int frequency = 0;
+				
+				if(input.contains(",")){
+					arguments = input.split(",");
+					card = Game.convertInput(arguments[0]);
+					frequency = Game.convertInput(arguments[1]);
+				}
+				else{
+					card = Game.convertInput(input);
+				}
 
 				if (player1.getPhase() == 2) {
-					try{
-						if (Integer.parseInt(input) < player1.getFaceDownCount()) { //need a try catch here. parse int
-							if (player1.getFaceDownCard(Integer.parseInt(input)) >= field.getLastCard()
-									|| player1.getFaceDownCard(Integer.parseInt(input)) == 10
-									|| player1.getFaceDownCard(Integer.parseInt(input)) == 2) {
+						if (card < player1.getFaceDownCount()) {
+							if (player1.getFaceDownCard(card) >= field.getLastCard()
+									|| player1.getFaceDownCard(card) == 10
+									|| player1.getFaceDownCard(card) == 2) {
 	
-								System.out.println("You played: " + player1.getFaceDownCard(Integer.parseInt(input)));
-								field.addCard(player1.getFaceDownCard(Integer.parseInt(input)));
+								Game.printPlay(player1.getFaceDownCard(card));
+								field.addCard(player1.getFaceDownCard(card));
 	
 								//handle special case card = 2
-								if (player1.getFaceDownCard(Integer.parseInt(input)) == 2) {
-									if(player1.getFaceDownCount() == 1){
+								if (player1.getFaceDownCard(card) != 2) {
 										invalidMove = false;
-									}
-									else{
-										invalidMove = true; //not really invalid, just allows the loop to reiterate using same var
-									}
-								} else {
-									invalidMove = false;
-								}
-								player1.removeCard(Integer.parseInt(input));
+								} 
+
+								player1.removeCard(card);
 								if(player1.getFaceDownCount() == 0){
-									invalidMove = false;
+									invalidMove = false; //double check, no reason to reloop if game is already over
 								}
-							} else {
-								field.addCard(player1.getFaceDownCard(Integer.parseInt(input)));
-								System.out.println("You played: " + player1.getFaceDownCard(Integer.parseInt(input)));
-								player1.removeCard(Integer.parseInt(input));
+							} 
+							else {
+								field.addCard(player1.getFaceDownCard(card));
+								Game.printPlay(player1.getFaceDownCard(card));
+								player1.removeCard(card);
 	
 								System.out.println("You picked up");
 								invalidMove = false;
 	
 								while (field.getSize() > 0) {
-									int card = field.empty();
-									player1.addCard(card);
+									int cards = field.empty();
+									player1.addCard(cards);
 								}
 							}
 						} else {
 							System.out.println("Invalid move, please select one of the face down cards..");
 						}
-					}
-					catch(IllegalArgumentException e){
-						System.out.println("Select a face down card by entering it's position 0, 1, 2, or 3");
-						invalidMove = true; //reloop //can probably omit this line, reloops by default.
-					}
 				}
-				else if (input.contains(",")) {
-					arguments = input.split(",");
-					try{
-						if (player1.play(arguments[0], Integer.parseInt(arguments[1]))
-								&& (field.compare(arguments[0]))) {
-							for (int i = 0; i < Integer.parseInt(arguments[1]); i++) {
-								player1.removeCard(Integer.parseInt(arguments[0]));
-								field.addCard(Integer.parseInt(arguments[0]));
+				else if (frequency > 1) {
+						if (player1.play(card, frequency) && card >= field.getLastCard()){
+							for (int i = 0; i < frequency; i++) {
+								player1.removeCard(card);
+								field.addCard(card);
 							}
-							System.out.println("You played: " + Integer.parseInt(arguments[0]) + " " + "("
-									+ Integer.parseInt(arguments[1]) + ") times");
+							Game.printPlay(card, frequency);
+					
 							// draw
 							try {
 								while (player1.handSize() < 3 && deck.cardsLeft() > 0) {
@@ -179,20 +176,18 @@ public class Game {
 						else {
 							System.out.println("invalid selection");
 						}
-					}
-					catch(IllegalArgumentException e){
-						System.out.println("To make a multiple card play, first type the card then the frequency like this: J,2");
-						invalidMove = true; //probably not needed
-					}
+
 				//Final check, if you play a higher card, continue, if not pick up. Also logic for special cards 10 & 2
 				} 
-				else if (player1.play(Integer.parseInt(input)) && (Integer.parseInt(input) >= field.getLastCard()
-						|| Integer.parseInt(input) == 2 || Integer.parseInt(input) == 10)) {
-					player1.removeCard(Integer.parseInt(input));
-					field.addCard(Integer.parseInt(input));
+				else if (player1.play(card) && (card >= field.getLastCard() || card == 2 || card == 10)) {
+					player1.removeCard(card);
+					field.addCard(card);
 
 					//check for 2, if 2 then reloop
-					if (Integer.parseInt(input) != 2) {
+					if (card != 2) {
+						invalidMove = false;
+					}
+					else if(player1.handSize() == 0 && player1.getFaceDownCount() == 0){
 						invalidMove = false;
 					}
 
@@ -204,20 +199,18 @@ public class Game {
 							// System.out.println("No more cards, testing ->"+
 						}
 					}
-
-					System.out.println("You played: " + Integer.parseInt(input));
-
+					Game.printPlay(card);
 				}
-				else if(Integer.parseInt(input)==0){ //'strategic' pick up, allows user to pick up even if they can beat it
+				else if(card == 0){ //'strategic' pick up, allows user to pick up even if they can beat it
 					System.out.println("You picked up");
 					invalidMove = false;
 
 					while (field.getSize() > 0) {
-						int card = field.empty();
-						player1.addCard(card);
+						int cards = field.empty();
+						player1.addCard(cards);
 					}
 				}
-				else if (!player1.play(Integer.parseInt(input))) {
+				else if (!player1.play(card)) {
 					System.out.println("invalid selection");
 				} 
 				else {
@@ -225,8 +218,8 @@ public class Game {
 					invalidMove = false;
 
 					while (field.getSize() > 0) {
-						int card = field.empty();
-						player1.addCard(card);
+						int cards = field.empty();
+						player1.addCard(cards);
 					}
 				}
 			} // End Player 1 Turn
@@ -287,7 +280,9 @@ public class Game {
 				else{
 					player2.removeCard(AIMove); 
 				}
-				System.out.println("The computer played: " + AIMove);
+				//System.out.println("The computer played: " + AIMove);
+				Game.printAIPlay(AIMove);
+
 				
 				//if this is their last card, ie, no hand / face up / or face down they win, ie do not reloop
 				if(player2.handSize() == 0 && player2.getFaceDownCount() == 0){
@@ -317,7 +312,9 @@ public class Game {
 						player2.removeCard(AIMove);
 						field.addCard(AIMove);
 					}
-					System.out.println("The computer played: " + AIMove + " " +"("+ frequency +")"+ " times");
+					//System.out.println("The computer played: " + AIMove + " " +"("+ frequency +")"+ " times");
+					Game.printAIPlay(AIMove, frequency);
+
 				}
 				else{
 					//regular 1 card play							
@@ -332,13 +329,16 @@ public class Game {
 						player2.removeCard(AIMove);
 					}
 
-					System.out.println("The computer played: " + AIMove);
+					//System.out.println("The computer played: " + AIMove);
+					Game.printAIPlay(AIMove);
+
 				}
 				AITurn = false;
 			} else {	// Computer picks up
 				if(player2.getPhase() == 2){
 					field.addCard(player2.getFaceDownCard(0));
-					System.out.println("The computer played: " + player2.getFaceDownCard(0));
+					//System.out.println("The computer played: " + player2.getFaceDownCard(0));
+					Game.printAIPlay(player2.getFaceDownCard(0));
 					player2.removeCard(0);
 				}
 				
@@ -386,4 +386,73 @@ public class Game {
 		}
 		in.close();
 	}
+	
+		//convert string representation of a card into the card value, or 0 if it doesn't match.
+		public static int convertInput(String input){
+			int card = 0;
+			
+			try{
+				card = Integer.parseInt(input);
+			}
+			catch(IllegalArgumentException e){
+				if(input.equals("J")){
+					card = 11;
+				}
+				else if(input.equals("Q")){
+					card = 12;
+				}
+				else if(input.equals("K")){
+					card = 13;
+				}
+				else if(input.equals("A")){
+					card = 14;
+				}
+				else{
+					card = -1;
+				}
+			}
+			return card;
+		}
+		
+		public static String convertOutput(int card){
+			String output;
+			switch(card){
+			case 14:
+				output = "A";
+				break;
+			case 13:
+				output = "K";
+				break;
+			case 12:
+				output = "Q";
+				break;
+			case 11:
+				output = "J";
+				break;
+			default:
+				output = Integer.toString(card); 		
+			}
+			return output;
+		}
+
+
+		public static void printPlay(int input){
+			String card = Game.convertOutput(input);
+			System.out.println("You played "+ card);
+		}
+		
+		public static void printAIPlay(int input){
+			String card = Game.convertOutput(input);
+			System.out.println("Computer played "+ card);
+		}
+		
+		public static void printPlay(int input, int frequency){
+			String card = Game.convertOutput(input);
+			System.out.println("You played "+card+" ("+frequency+") "+" times");
+		}
+		
+		public static void printAIPlay(int input, int frequency){
+			String card = Game.convertOutput(input);
+			System.out.println("Computer played "+card+" ("+frequency+") "+" times");
+		}
 }
