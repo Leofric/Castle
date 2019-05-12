@@ -24,12 +24,7 @@ package Castle;
 import java.util.Scanner;
 
 // PROGRAM BUGS
-/*	
-
- * If you can't beat the current field card with your face up card, do you still put face up card on top of pile
- * then pick it up? or do you leave the face up card face up / separate from the pile? I think I have it right but
- * not entirely sure on the rules. 
-	  
+/*	  
 	  
  * Dumb AI: 
  	 - AI has 2, 2, 10 - then it is better to play the 10. currently hard coded to prioritize 2's

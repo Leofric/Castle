@@ -13,11 +13,6 @@ public class PlayingField {
 		playingField.add(card);
 	}
 	
-	public void addCard(String input) {
-		int card = this.convertInput(input);
-		playingField.add(card);
-	}
-
 	public int getLastCard() {
 		int returns;
 		int lastCard = playingField.size();
@@ -57,39 +52,5 @@ public class PlayingField {
 			}
 		return clear;
 	}
-	
-	public boolean compare(String input){
-		boolean valid = false;
-		int card = this.convertInput(input);
 
-		if(card >= this.getLastCard())
-			valid = true;		
-		return valid;
-	}
-
-	public int convertInput(String input){
-		int card = 0;
-		
-		try{
-			card = Integer.parseInt(input);
-		}
-		catch(IllegalArgumentException e){
-			if(input.equals("J")){
-				card = 11;
-			}
-			else if(input.equals("Q")){
-				card = 12;
-			}
-			else if(input.equals("K")){
-				card = 13;
-			}
-			else if(input.equals("A")){
-				card = 14;
-			}
-			else{
-				card = 0;
-			}
-		}
-		return card;
-	}
 }

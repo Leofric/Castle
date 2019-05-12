@@ -270,6 +270,9 @@ public class Player {
 	}
 	
 	//Fixed, but is there a way to condense the code? 
+	//currently have 3 visualize methods that do pretty much the same thing..
+	//could maybe condense into 1 method, and based on input change output? maybe?
+	//might make it more complex than it needs to be
 	public void visualize(){
 		System.out.println("** YOU **");
 		System.out.print("   Hand			 ");
