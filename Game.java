@@ -390,16 +390,16 @@ public class Game {
 				card = Integer.parseInt(input);
 			}
 			catch(IllegalArgumentException e){
-				if(input.equals("J")){
+				if(input.equals("J") || input.equals("j")){
 					card = 11;
 				}
-				else if(input.equals("Q")){
+				else if(input.equals("Q") || input.equals("q")){
 					card = 12;
 				}
-				else if(input.equals("K")){
+				else if(input.equals("K") || input.equals("k")){
 					card = 13;
 				}
-				else if(input.equals("A")){
+				else if(input.equals("A") || input.equals("a")){
 					card = 14;
 				}
 				else{
