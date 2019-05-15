@@ -96,7 +96,7 @@ public class Player {
 		}
 	}
 	
-	//player 2 card play
+	//player - 2 card play
 	public boolean play(int card, int frequency) {
 		boolean valid = false;
 		
@@ -111,7 +111,7 @@ public class Player {
 		return valid;
 	}
 
-	//normal player 1 card play
+	//normal player - 1 card play
 	public boolean play(int card) {
 		boolean valid = false;
 			
@@ -125,9 +125,6 @@ public class Player {
 	}
 	
 	//chooses 'best' card for the AI to play based on situation
-	//can probably optimize this. Clean it up when you come back to improve AI logic.
-	//when it plays a 2, you should set a flag or something so it always plays the lowest card next? or does it do that already?
-	//how to I stop a 2 --> 2 --> 10 play? maybe just another case statement.
 	public int AIplay(int lastCard) {
 		int bestCard = 0;
 		boolean has2 = false;
@@ -153,10 +150,10 @@ public class Player {
 				}
 			}
 			
-			//if no moves but has a 2, play the 2
+			//if no moves but has a 10, play the 10
 			if(bestCard == 0 && has10){
 				bestCard = 10;
-			}//if no moves and no 2 but has a 10, play the 10
+			}//if no moves and no 10 but has a 2, play the 2
 			else if(bestCard == 0 && has2){
 				bestCard = 2;
 			}//otherwise no moves, pickup
@@ -186,12 +183,12 @@ public class Player {
 				}
 			}
 			
-			//if no moves but has a 2, play the 2
-			if(bestCard == 0 && has2){
-				bestCard = 2;
-			}//if no moves and no 2 but has a 10, play the 10
-			else if(bestCard == 0 && has10){
+			//if no moves but has a 10, play the 10
+			if(bestCard == 0 && has10){
 				bestCard = 10;
+			}//if no moves and no 10 but has a 2, play the 2
+			else if(bestCard == 0 && has2){
+				bestCard = 2;
 			}//otherwise no moves, pickup
 
 		}
@@ -275,28 +272,39 @@ public class Player {
 		return frequency;
 	}
 	
-	//Fixed, but is there a way to condense the code? 
-	//currently have 3 visualize methods that do pretty much the same thing..
-	//could maybe condense into 1 method, and based on input change output? maybe?
-	//might make it more complex than it needs to be
-	public void visualize(){
-		System.out.println("** YOU **");
+	//Method prints card data to the console. 
+	public void visualize(String user){
+		if(user == "Player"){
+			System.out.println("** YOU **");
+		}
+		else if(user == "AI"){
+			System.out.println("** CPU **");
+		}
+		else{
+			System.out.println("** TEST **");
+		}
+		
 		System.out.print("   Hand			 ");
 		for (int i = 0; i < playersHand.size(); i++) {
-			if(playersHand.get(i) == 11){
-				System.out.print("[J] ");
-			}
-			else if(playersHand.get(i) == 12){
-				System.out.print("[Q] ");
-			}
-			else if(playersHand.get(i) == 13){
-				System.out.print("[K] ");
-			}
-			else if(playersHand.get(i) == 14){
-				System.out.print("[A] ");
+			if(user == "AI"){
+				System.out.print("[?] ");
 			}
 			else{
-				System.out.print("["+playersHand.get(i)+"] ");
+				if(playersHand.get(i) == 11){
+					System.out.print("[J] ");
+				}
+				else if(playersHand.get(i) == 12){
+					System.out.print("[Q] ");
+				}
+				else if(playersHand.get(i) == 13){
+					System.out.print("[K] ");
+				}
+				else if(playersHand.get(i) == 14){
+					System.out.print("[A] ");
+				}
+				else{
+					System.out.print("["+playersHand.get(i)+"] ");
+				}
 			}
 		}
 		System.out.print("\n");
@@ -323,108 +331,27 @@ public class Player {
 
 		System.out.print("   Face Down		 ");
 		for(int i = 0; i<faceDown.size(); i++){
-			System.out.print("[?] ");
-		}
-		System.out.print("\n\n");
-	}
-	
-	//Fixed, but is there a way to condense the code? 
-	public void visualizeAI(){
-		System.out.println("** CPU **");
-		System.out.print("   Hand			 ");
-		for(int i = 0; i<playersHand.size(); i++){
-			System.out.print("[?] ");
-		}
-		System.out.print("\n");
-
-		System.out.print("   Face Up		 ");
-		for (int i = 0; i < faceUp.size(); i++) {
-			if(faceUp.get(i) == 11){
-				System.out.print("[J] ");
-			}
-			else if(faceUp.get(i) == 12){
-				System.out.print("[Q] ");
-			}
-			else if(faceUp.get(i) == 13){
-				System.out.print("[K] ");
-			}
-			else if(faceUp.get(i) == 14){
-				System.out.print("[A] ");
+			if(user == "test"){
+				if(faceDown.get(i) == 11){
+					System.out.print("[J] ");
+				}
+				else if(faceDown.get(i) == 12){
+					System.out.print("[Q] ");
+				}
+				else if(faceDown.get(i) == 13){
+					System.out.print("[K] ");
+				}
+				else if(faceDown.get(i) == 14){
+					System.out.print("[A] ");
+				}
+				else{
+					System.out.print("["+faceDown.get(i)+"] ");
+				}
 			}
 			else{
-				System.out.print("["+faceUp.get(i)+"] ");
-			}
-		}
-		System.out.print("\n");
-		
-		System.out.print("   Face Down		 ");
-		for(int i = 0; i<faceDown.size(); i++){
-			System.out.print("[?] ");
-		}
-		System.out.print("\n\n");
-	}
-
-	//Fixed, but is there a way to condense the code? 
-	public void visualizeAll(){
-		System.out.print("   Hand			 ");
-		for (int i = 0; i < playersHand.size(); i++) {
-			if(playersHand.get(i) == 11){
-				System.out.print("J ");
-			}
-			else if(playersHand.get(i) == 12){
-				System.out.print("Q ");
-			}
-			else if(playersHand.get(i) == 13){
-				System.out.print("K ");
-			}
-			else if(playersHand.get(i) == 14){
-				System.out.print("A ");
-			}
-			else{
-				System.out.print(playersHand.get(i)+" ");
-			}
-		}
-		System.out.print("\n");
-		
-		System.out.print("   Face Up		 ");
-		for (int i = 0; i < faceUp.size(); i++) {
-			if(faceUp.get(i) == 11){
-				System.out.print("J ");
-			}
-			else if(faceUp.get(i) == 12){
-				System.out.print("Q ");
-			}
-			else if(faceUp.get(i) == 13){
-				System.out.print("K ");
-			}
-			else if(faceUp.get(i) == 14){
-				System.out.print("A ");
-			}
-			else{
-				System.out.print(faceUp.get(i)+" ");
-			}
-		}
-		System.out.print("\n");
-	
-		System.out.print("   Face Down		 ");
-		for (int i = 0; i < faceDown.size(); i++) {
-			if(faceDown.get(i) == 11){
-				System.out.print("J ");
-			}
-			else if(faceDown.get(i) == 12){
-				System.out.print("Q ");
-			}
-			else if(faceDown.get(i) == 13){
-				System.out.print("K ");
-			}
-			else if(faceDown.get(i) == 14){
-				System.out.print("A ");
-			}
-			else{
-				System.out.print(faceDown.get(i)+" ");
+				System.out.print("[?] ");
 			}
 		}
 		System.out.print("\n\n");
 	}
-		
 }

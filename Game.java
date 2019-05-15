@@ -1,13 +1,6 @@
 package Castle;
 import java.util.Scanner;
 
-//TO DO
-// 1. Player Class
-//		i. AIPlay Logic
-//	   ii. Condense 3 visualize methods?
-// 2. PlayingField
-//		i. there must be an easier way to check if the last 4 cards are the same..
-
 public class Game {	
 	public static void main(String[] args) {
 		System.out.println("Welcome to the virtual Castle game! This is a 1 vs 1");
@@ -54,8 +47,8 @@ public class Game {
 			String arguments[] = new String[2];
 			
 			//Visualization of the game
-			player2.visualizeAI();
-			player1.visualize();
+			player2.visualize("AI");
+			player1.visualize("Player");
 			
 			//Start Player 1 Turn
 			//This loop represents 1 turn, invalidMove allows player to try again if they make a mistake
@@ -190,7 +183,7 @@ public class Game {
 			// Check for special cases 
 			// Four of a kind ~ clear field
 			if (field.size() > 3) {
-				if(field.get(field.size()-1) == field.get(field.size()-2) && field.get(field.size()-2) == field.get(field.size()-3) && field.get(field.size() -3) == field.get(field.size()-4)){
+				if(field.get(field.size()-1) == field.get(field.size()-2) && field.get(field.size()-1) == field.get(field.size()-3) && field.get(field.size()-1) == field.get(field.size()-4)){
 					field.clear();
 					System.out.println("4 of a kind! The playing field has been cleared!");
 				}
@@ -225,11 +218,7 @@ public class Game {
 			}
 			
 			int AIMove = 0;
-			if(field.isEmpty())
-				AIMove = player2.AIplay(0);
-			else
-				AIMove = player2.AIplay(field.peek());
-
+			AIMove = player2.AIplay(field.peek());
 
 			//if AIMove = 2, then you need to run previous line again
 			if(AIMove == 2){
@@ -256,7 +245,11 @@ public class Game {
 				else
 					frequency = 1;
 
-				//multiple card play
+				//niche play?
+				if(frequency > 1 && AIMove == 10 && deck.cardsLeft() > 0){
+					frequency = 1;
+				}
+				
 				if(frequency > 1){
 					for (int i = 0; i < frequency ; i++) {
 						player2.removeCard(AIMove);
