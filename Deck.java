@@ -27,7 +27,7 @@ public class Deck {
 	}
 	
 	public int drawCard(){
-		int randomIndex = rn.nextInt(Math.abs(deck.size())); // deck.size() -1 could be the error here
+		int randomIndex = rn.nextInt(Math.abs(deck.size()));
 		int drawnCard = deck.get(randomIndex);
 		deck.remove(randomIndex);
 		

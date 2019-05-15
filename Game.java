@@ -1,46 +1,18 @@
 package Castle;
-/*	GAME RULES ~ EXPLAINATION
- 		The purpose of the game is to get rid of all of your cards before your opposition does. At the start of the game,
- 		each player is dealt 4 cards face down, these cards are to remain face down until all of the players cards have
- 		been played. Each player is also then dealt 7 more cards that they can look at, any cards left over after dealing
- 		all players in are placed in a stack in the middle of the playing field. Once all players have recieved their 4 
- 		face down cards and regular 7 card hand, each player must then select 4 cards from their hand and place them face
- 		up on top of their 4 face down cards. Once all players have placed their 4 cards face up on their 4 face down cards,
- 		the game can begin. Players must keep 3 cards in their hand at all times, After playing a card or cards, players
- 		must draw from the extra cards to maintain the 3 card hand until all cards from the middle have been depleted. 
- 		
- 		Each player takes turns playing one of the cards from their hand. When playing a card, the face value of the card 
- 		must be greater than or equal to the value of the card on the board. A player may not play a card that has a lower
- 		value than that of which is on the board. If a player cannot beat the card on the board, then they must pick up all
- 		cards on the table and are not allowed to play any cards that turn. Cards 3-9 and 11-14(J, Q, K, A) are regular
- 		cards with their values corresponding in that order. 2's and 10's are special cards each with their own special
- 		properties. When a 10 is played, all cards on the table are discarded and removed from the game. When a 2 is played,
- 		the player may play a second card on top of it of any value, essentialy soft reseting the pile however all cards
- 		below remain in play. Additionally if 4 of the same card are played, either by the same player or a combination of 
- 		players, all cards on the table are discarded and removed from the game.  
- */
-
-
 import java.util.Scanner;
 
-// PROGRAM BUGS
-/*	  
-	  
- * Dumb AI: 
- 	 - AI has 2, 2, 10 - then it is better to play the 10. currently hard coded to prioritize 2's
- 	 - never play a 10 (2) times unless drawing deck is empty?
- 	 - 2, 2, 10 makes sense if that is all you have going into face up phase
-	 
-	 - doesn't play high cards when you are on last face down cards, will even play a 10 and clear the pile and 
-	 	let you win, no logic
- 
-*/
+//TO DO
+// 1. Player Class
+//		i. AIPlay Logic
+//	   ii. Condense 3 visualize methods?
+// 2. PlayingField
+//		i. there must be an easier way to check if the last 4 cards are the same..
 
 public class Game {	
 	public static void main(String[] args) {
 		System.out.println("Welcome to the virtual Castle game! This is a 1 vs 1");
 
-		// initialization
+		//Initialization
 		Scanner in = new Scanner(System.in);
 		Deck deck = new Deck();
 		PlayingField field = new PlayingField();
@@ -63,8 +35,8 @@ public class Game {
 		player2.AIFaceUp();
 		System.out.println("Please select 4 cards to put face up on the board.");
 		player1.displayHand();
-		int check = 0; // so if a player makes an invalid move, it goes through
-					   // the loop again instead of adding a 0
+		
+		int check = 0; //allows player to try again if they make a mistake
 		while (check < 4) {			
 			int card = Game.convertInput(in.nextLine());
 			if (player1.addFaceUp(card)) {
@@ -73,7 +45,7 @@ public class Game {
 				System.out.println("Sorry that card is not in your hand, try again");
 		}
 		
-		// Starting the game, Phase 1
+		//Starting the game, Phase 1
 		System.out.println("Choose a card to play to begin the game!");
 		boolean win = false;
 
@@ -85,12 +57,9 @@ public class Game {
 			player2.visualizeAI();
 			player1.visualize();
 			
-			//Debugging ONLY - show all cards
-			//player2.visualizeAll();
-			//player1.visualizeAll();
-			
 			//Start Player 1 Turn
-			while (invalidMove) { // This whole loop = 1 player turn, if they make a invalid move, they can try again
+			//This loop represents 1 turn, invalidMove allows player to try again if they make a mistake
+			while (invalidMove) {
 	
 				//player 1 set phase
 				if (player1.handSize() > 0) {
@@ -116,12 +85,12 @@ public class Game {
 
 				if (player1.getPhase() == 2) {
 						if (card < player1.getFaceDownCount()) {
-							if (player1.getFaceDownCard(card) >= field.getLastCard()
+							if (player1.getFaceDownCard(card) >= field.peek()
 									|| player1.getFaceDownCard(card) == 10
 									|| player1.getFaceDownCard(card) == 2) {
 	
 								Game.printPlay(player1.getFaceDownCard(card));
-								field.addCard(player1.getFaceDownCard(card));
+								field.push(player1.getFaceDownCard(card));
 	
 								//handle special case card = 2
 								if (player1.getFaceDownCard(card) != 2) {
@@ -134,15 +103,15 @@ public class Game {
 								}
 							} 
 							else {
-								field.addCard(player1.getFaceDownCard(card));
+								field.push(player1.getFaceDownCard(card));
 								Game.printPlay(player1.getFaceDownCard(card));
 								player1.removeCard(card);
 	
 								System.out.println("You picked up");
 								invalidMove = false;
 	
-								while (field.getSize() > 0) {
-									int cards = field.empty();
+								while (!field.isEmpty()) {
+									int cards = field.pop();
 									player1.addCard(cards);
 								}
 							}
@@ -151,10 +120,10 @@ public class Game {
 						}
 				}
 				else if (frequency > 1) {
-						if (player1.play(card, frequency) && card >= field.getLastCard()){
+						if (player1.play(card, frequency) && card >= field.peek()){
 							for (int i = 0; i < frequency; i++) {
 								player1.removeCard(card);
-								field.addCard(card);
+								field.push(card);
 							}
 							Game.printPlay(card, frequency);
 					
@@ -163,7 +132,8 @@ public class Game {
 								while (player1.handSize() < 3 && deck.cardsLeft() > 0) {
 									player1.addCard(deck.drawCard());
 								}
-							} catch (IllegalArgumentException x) {
+							} 
+							catch (IllegalArgumentException x) {
 								System.out.println("Something went wrong");
 							}
 							invalidMove = false;
@@ -171,12 +141,10 @@ public class Game {
 						else {
 							System.out.println("invalid selection");
 						}
-
-				//Final check, if you play a higher card, continue, if not pick up. Also logic for special cards 10 & 2
 				} 
-				else if (player1.play(card) && (card >= field.getLastCard() || card == 2 || card == 10)) {
+				else if (player1.play(card) && (card >= field.peek() || card == 2 || card == 10)) {
 					player1.removeCard(card);
-					field.addCard(card);
+					field.push(card);
 
 					//check for 2, if 2 then reloop
 					if (card != 2) {
@@ -187,21 +155,21 @@ public class Game {
 					}
 
 					// draw
-					if (player1.handSize() < 3) {
+					if (player1.handSize() < 3 && deck.cardsLeft() > 0) {
 						try {
 							player1.addCard(deck.drawCard());
 						} catch (IllegalArgumentException e) {
-							// System.out.println("No more cards, testing ->"+
+							System.out.println("Something went wrong");
 						}
 					}
 					Game.printPlay(card);
 				}
-				else if(card == 0){ //'strategic' pick up, allows user to pick up even if they can beat it
+				else if(card == 0){ //'strategic' pick up
 					System.out.println("You picked up");
 					invalidMove = false;
 
-					while (field.getSize() > 0) {
-						int cards = field.empty();
+					while (!field.isEmpty()) {
+						int cards = field.pop();
 						player1.addCard(cards);
 					}
 				}
@@ -212,38 +180,34 @@ public class Game {
 					System.out.println("You picked up");
 					invalidMove = false;
 
-					while (field.getSize() > 0) {
-						int cards = field.empty();
+					while (!field.isEmpty()) {
+						int cards = field.pop();
 						player1.addCard(cards);
 					}
-				}
+				}				
 			} // End Player 1 Turn
 
 			// Check for special cases 
 			// Four of a kind ~ clear field
-			if (field.getSize() > 3) {
-				if (field.fourOfAKind()) {
-					while (field.getSize() > 0) {
-						field.empty();
-					}
+			if (field.size() > 3) {
+				if(field.get(field.size()-1) == field.get(field.size()-2) && field.get(field.size()-2) == field.get(field.size()-3) && field.get(field.size() -3) == field.get(field.size()-4)){
+					field.clear();
 					System.out.println("4 of a kind! The playing field has been cleared!");
 				}
 			}
+
 			// Special card 10 ~ clear field
-			if (field.getSize() > 0 && field.getLastCard() == 10) {
-				while (field.getSize() > 0) {
-					field.empty();
-				}
+			if (!field.isEmpty() && field.peek() == 10) {
+				field.clear();
 				System.out.println("10 cleared the field");
 			}
-			// End special cases
 			
 			
 		// Begin AI Turn
 		boolean AITurn = true;
 		
-		//check to see if player 1 already won, no need to play this turn if game is already over
-		if (player1.handSize() == 0 && player1.getFaceDownCount() == 0 && player1.getFaceUpCount() == 0) {
+		//check to see if player 1 already won
+		if (player1.handSize() == 0 && player1.getFaceDownCount() == 0) {
 			win = true;
 			AITurn = false;
 			System.out.println("You won!");
@@ -260,85 +224,67 @@ public class Game {
 				player2.setPhase(2);
 			}
 			
-			int AIMove = player2.AIplay(field.getLastCard());	//this method returns the 'best' card for ai to play
+			int AIMove = 0;
+			if(field.isEmpty())
+				AIMove = player2.AIplay(0);
+			else
+				AIMove = player2.AIplay(field.peek());
+
 
 			//if AIMove = 2, then you need to run previous line again
 			if(AIMove == 2){
-				field.addCard(AIMove);
-				
-				// If phase 2, need to remove from the face down deck instead of regular hand, since that one is empty
-				//  so have to remove it differently to distinguish
-				//  Otherwise, remove normally (regular hand)
-				if(player2.getPhase() == 2){
+				field.push(AIMove);
+			
+				if(player2.getPhase() == 2)
 					player2.removeCard(0);	//AI always plays the first (location 0) face down card, no effect on gameplay
-				}
-				else{
+				else
 					player2.removeCard(AIMove); 
-				}
-				//System.out.println("The computer played: " + AIMove);
 				Game.printAIPlay(AIMove);
 
-				
-				//if this is their last card, ie, no hand / face up / or face down they win, ie do not reloop
-				if(player2.handSize() == 0 && player2.getFaceDownCount() == 0){
+				//Check win condition
+				if(player2.handSize() == 0 && player2.getFaceDownCount() == 0)
 					AITurn = false;
-				}
-				else{
-				AITurn = true;
-				}
+				else
+					AITurn = true;
 			}
-			else if (AIMove > 0) {	//Computer play 
+			else if (AIMove > 0) {
 				int frequency;
-				if(player2.getPhase() == 0){
+				if(player2.getPhase() == 0)
 					frequency = player2.getCardFrequency(AIMove);
-				}
-				else if(player2.getPhase() == 1){
+				else if(player2.getPhase() == 1)
 					frequency = player2.getCardFrequencyFaceup(AIMove);
-				}
-				else{
-					//this happens in phase 2, face down cards, cannot play multiples of face down bc they are hidden
-					//keep an eye out to make sure comp never plays 2 face down at a time, unless it is a 2 of course
+				else
 					frequency = 1;
-				}
-				
+
+				//multiple card play
 				if(frequency > 1){
-					//multiple card play
 					for (int i = 0; i < frequency ; i++) {
 						player2.removeCard(AIMove);
-						field.addCard(AIMove);
+						field.push(AIMove);
 					}
-					//System.out.println("The computer played: " + AIMove + " " +"("+ frequency +")"+ " times");
 					Game.printAIPlay(AIMove, frequency);
-
 				}
-				else{
-					//regular 1 card play							
-					field.addCard(AIMove);
+				else {
+					field.push(AIMove);
 					
-					//If it is phase 1, you can remove by passing in value of card, ie 2-14
-					//If it is phase 2, you need to pass the location, since face down cards are hidden.
-					if(player2.getPhase() == 2){
-						player2.removeCard(0);	//AI always plays the first (location 0) face down card, just to simplify design
-					}
-					else{
+					if(player2.getPhase() == 2)
+						player2.removeCard(0);
+					else
 						player2.removeCard(AIMove);
-					}
-
-					//System.out.println("The computer played: " + AIMove);
+					
 					Game.printAIPlay(AIMove);
-
 				}
 				AITurn = false;
-			} else {	// Computer picks up
+			}
+			else {	// Computer picks up
 				if(player2.getPhase() == 2){
-					field.addCard(player2.getFaceDownCard(0));
-					//System.out.println("The computer played: " + player2.getFaceDownCard(0));
+					field.push(player2.getFaceDownCard(0));
 					Game.printAIPlay(player2.getFaceDownCard(0));
 					player2.removeCard(0);
 				}
 				
-				while (field.getSize() > 0) {
-					int card = field.empty();
+				while (!field.isEmpty()) {
+					int card = field.pop();
 					player2.addCard(card);
 					AITurn = false;
 				}
@@ -351,25 +297,21 @@ public class Game {
 					player2.addCard(deck.drawCard());
 				}
 			} catch (IllegalArgumentException x) {
-				//if something breaks
 				System.out.println("Something went wrong");
 			}
 
-			// special cases
-			// four of a kind clear
-			if (field.getSize() > 3) {
-				if (field.fourOfAKind()) {
-					while (field.getSize() > 0) {
-						field.empty();
-					}
-					System.out.println("4 of a kind!!! the playing field has been cleared! Size:" + field.getSize());
+			// Check for special cases 
+			// Four of a kind ~ clear field
+			if (field.size() > 3) {
+				if(field.get(field.size()-1) == field.get(field.size()-2) && field.get(field.size()-2) == field.get(field.size()-3) && field.get(field.size()-3) == field.get(field.size()-4)){
+					field.clear();
+					System.out.println("4 of a kind! The playing field has been cleared!");
 				}
 			}
-			// special card 10 clear
-			if (field.getSize() > 0 && field.getLastCard() == 10) {
-				while (field.getSize() > 0) {
-					field.empty();
-				}
+
+			// Special card 10 ~ clear field
+			if (!field.isEmpty() && field.peek() == 10) {
+				field.clear();
 				System.out.println("10 cleared the field");
 			}
 
@@ -382,33 +324,29 @@ public class Game {
 		in.close();
 	}
 	
-		//convert string representation of a card into the card value, or 0 if it doesn't match.
+		//convert input into card value, or -1 if input doesn't match. 
 		public static int convertInput(String input){
 			int card = 0;
 			
-			try{
+			try {
 				card = Integer.parseInt(input);
 			}
 			catch(IllegalArgumentException e){
-				if(input.equals("J") || input.equals("j")){
+				if(input.equals("J") || input.equals("j"))
 					card = 11;
-				}
-				else if(input.equals("Q") || input.equals("q")){
+				else if(input.equals("Q") || input.equals("q"))
 					card = 12;
-				}
-				else if(input.equals("K") || input.equals("k")){
+				else if(input.equals("K") || input.equals("k"))
 					card = 13;
-				}
-				else if(input.equals("A") || input.equals("a")){
+				else if(input.equals("A") || input.equals("a"))
 					card = 14;
-				}
-				else{
+				else
 					card = -1;
-				}
 			}
 			return card;
 		}
 		
+		//convert input 'card value' to string representation
 		public static String convertOutput(int card){
 			String output;
 			switch(card){
@@ -430,22 +368,25 @@ public class Game {
 			return output;
 		}
 
-
+		//prints successful player move to the console
 		public static void printPlay(int input){
 			String card = Game.convertOutput(input);
 			System.out.println("You played "+ card);
 		}
 		
+		//prints successful computer move to the console
 		public static void printAIPlay(int input){
 			String card = Game.convertOutput(input);
 			System.out.println("Computer played "+ card);
 		}
 		
+		//prints successful player multi card moves to the console
 		public static void printPlay(int input, int frequency){
 			String card = Game.convertOutput(input);
 			System.out.println("You played "+card+" ("+frequency+") "+" times");
 		}
 		
+		//prints successful computer multi card moves to the console
 		public static void printAIPlay(int input, int frequency){
 			String card = Game.convertOutput(input);
 			System.out.println("Computer played "+card+" ("+frequency+") "+" times");

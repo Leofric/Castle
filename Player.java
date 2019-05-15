@@ -19,10 +19,12 @@ public class Player {
 		playersHand = new ArrayList<Integer>();
 	}
 
+	//method adds input card to player hand
 	public void addCard(int card) {
 		playersHand.add(card);
 	}
 
+	//method adds a card from player hand to face up array
 	public boolean addFaceUp(int input) {
 		boolean found = false;
 		
@@ -37,10 +39,12 @@ public class Player {
 		return found;
 	}
 
+	//method adds input card to player face down array
 	public void addFaceDown(int card) {
 		faceDown.add(card);
 	}
 
+	//method prints the cards in the players hand to the console
 	public void displayHand() {		
 		System.out.print("Hand: ");
 		for (int i = 0; i < playersHand.size(); i++) {
@@ -83,7 +87,7 @@ public class Player {
 					faceUpCount++;
 				}
 				
-				//not elegant, but needed to break in certain situations to prevent more than 4 cards being picked
+				//not elegant, but needed to break in certain situations to prevent more than 4 cards being placed
 				if(faceUpCount>3){
 					i = playersHand.size();
 				}
@@ -122,6 +126,8 @@ public class Player {
 	
 	//chooses 'best' card for the AI to play based on situation
 	//can probably optimize this. Clean it up when you come back to improve AI logic.
+	//when it plays a 2, you should set a flag or something so it always plays the lowest card next? or does it do that already?
+	//how to I stop a 2 --> 2 --> 10 play? maybe just another case statement.
 	public int AIplay(int lastCard) {
 		int bestCard = 0;
 		boolean has2 = false;
